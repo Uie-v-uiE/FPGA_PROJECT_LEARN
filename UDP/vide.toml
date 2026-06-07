@@ -1,7 +1,8 @@
 #:schema https://vide.pascal-lab.net/schemas/v1/vide.schema.json
-sources = []
+sources = ["**/*.v",  
+    "**/*.sv"]
 
-# include_dirs = ["include"]
+# include_dirs = ["."]
 # defines = ["SYNTHESIS"]
 # top_modules = ["top"]
 # libraries = ["../common_cells"]
