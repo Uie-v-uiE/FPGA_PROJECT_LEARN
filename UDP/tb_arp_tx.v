@@ -3,8 +3,8 @@
 module tb_arp_tx;
 
     // 端口声明
-    reg        sys_clk;
-    reg        sys_rst_n;
+    reg        clk;
+    reg        rst_n;
     reg        arp_data_en;
     reg  [7:0] arp_tx_data;
     reg  [7:0] arp_crc_32;
@@ -23,8 +23,8 @@ module tb_arp_tx;
 
     // 例化待测模块
     arp_tx u_arp_tx (
-        .sys_clk       (sys_clk),
-        .sys_rst_n     (sys_rst_n),
+        .clk,
+        .rst_n,
         .arp_data_en   (arp_data_en),
         .arp_tx_data   (arp_tx_data),
         .arp_crc_32    (arp_crc_32),
@@ -38,21 +38,21 @@ module tb_arp_tx;
 
     // 1. 生成系统时钟 100MHz (10ns周期)
     initial begin
-        sys_clk = 1'b0;
-        forever #5 sys_clk = ~sys_clk;
+        clk = 1'b0;
+        forever #5 clk = ~clk;
     end
 
     // 2. 激励信号
     initial begin
         // 初始值
-        sys_rst_n   = 1'b0;
+        rst_n       = 1'b0;
         arp_data_en = 1'b0;
         arp_tx_data = 8'h00;
         arp_crc_32  = 8'hFF;
 
         // 复位
         #20;
-        sys_rst_n = 1'b1;
+        rst_n = 1'b1;
         #20;
 
         // 启动发送

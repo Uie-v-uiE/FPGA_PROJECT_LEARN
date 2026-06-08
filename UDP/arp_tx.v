@@ -15,8 +15,8 @@ module arp_tx #(
     parameter [15:0] ARP_OPCODE_REPLY   = 16'h00_02,
     parameter [31:0] SRC_IP_ADDRESS     = 32'hc0_a8_01_66
 ) (
-    input            sys_clk,
-    input            sys_rst_n,
+    input            clk,
+    input            rst_n,
     input            arp_data_en,
     input      [7:0] arp_tx_data,
     input      [7:0] arp_crc_32,
@@ -32,14 +32,14 @@ module arp_tx #(
     reg [4:0] cnt_data;
     reg [3:0] cnt_crc;
 
-    assign gmii_tx_clk    = sys_clk;
+    assign gmii_tx_clk    = clk;
     assign gmii_tx_clk_en = 1;
-    assign gmii_tx_rst_n  = sys_rst_n;
+    assign gmii_tx_rst_n  = rst_n;
     assign gmii_tx_en     = arp_data_en;
     assign gmii_tx_er     = 1'b0;
 
-    always @(posedge sys_clk or negedge sys_rst_n) begin
-        if (!sys_rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
             cnt      <= 7'd0;
             cnt_data <= 5'd18;
             cnt_crc  <= 3'd4;
