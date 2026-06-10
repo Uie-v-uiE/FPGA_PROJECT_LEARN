@@ -2,7 +2,7 @@
 sources = ["**/*.v",  
     "**/*.sv"]
 
-# include_dirs = ["."]
+# include_dirs = ["include"]
 # defines = ["SYNTHESIS"]
 # top_modules = ["top"]
 # libraries = ["../common_cells"]

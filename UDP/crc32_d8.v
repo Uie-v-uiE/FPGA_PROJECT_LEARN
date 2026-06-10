@@ -1,16 +1,16 @@
 `timescale 1ns / 1ns
 module crc32_d8 (
-    input             clk,       //时钟信号
-    input             rst_n,     //复位信号，低电平有效
-    input      [ 7:0] data,      //输入待校验8位数据
-    input             crc_en,    //crc使能，开始校验标志
-    input             crc_clr,   //crc数据复位信号            
-    output reg [31:0] crc_data,  //CRC校验数据
-    output     [31:0] crc_next   //CRC下次校验完成数据
+    input             clk,      //时钟信号
+    input             rst_n,    //复位信号，低电平有效
+    input      [ 7:0] data,     //输入待校验8位数据
+    input             crc_en,   //crc使能，开始校验标志
+    input             crc_clr,  //crc数据复位信号            
+    output reg [31:0] crc_data  //CRC校验数据
 );
 
+    wire [31:0] crc_next;
     //输入待校验8位数据,需要先将高低位互换
-    wire [7:0] data_t;
+    wire [ 7:0] data_t;
 
     assign data_t = {data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]};
 
