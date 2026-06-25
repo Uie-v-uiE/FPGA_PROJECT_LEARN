@@ -21,6 +21,9 @@ module arp #(
     output [7:0] tx_data
 );
 
+    wire [31:0] crc_data;
+    wire        data;
+
     arp_tx u_arp_tx (
         .clk           (sys_clk),
         .rst_n         (sys_rst_n),
@@ -41,8 +44,6 @@ module arp #(
         .crc_clr (crc_clr),
         .crc_en  (crc_en),
         .crc_data(crc_data),
-        .crc_en  (crc_en),
-        .crc_next(crc_next),
         .data    (data)
     );
 
