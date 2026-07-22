@@ -186,7 +186,7 @@ module sdram_init #(
         end else if (init_current_state == INIT_TMRD && init_next_state == INIT_END) begin
             init_end <= 1'd1;
         end else begin
-            init_end <= 1'd0;
+            init_end <= init_end;
         end
     end
 
