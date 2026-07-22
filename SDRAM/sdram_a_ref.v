@@ -3,7 +3,7 @@ module sdram_a_ref #(
     parameter P_CHARGE     = 4'b0010,
     parameter AUTO_REF     = 4'b0001,
     parameter M_REG_SET    = 4'b0000,
-    parameter CNT_REF_MAX  = 374,
+    parameter CNT_REF_MAX  = 749,
     parameter AREF_TRP_CLK = 2,
     parameter AREF_TRF_CLK = 7,
     parameter AREF_TRF_CNT = 2,
