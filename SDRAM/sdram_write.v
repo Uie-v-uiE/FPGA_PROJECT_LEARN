@@ -16,25 +16,25 @@ module sdram_write #(
     parameter WR_END          = 8'b1000_0000
 
 ) (
-    input         sys_clk,
-    input         sys_rst_n,
-    input         init_end,
-    input         wr_en,
-    input  [23:0] wr_addr,
-    input  [15:0] wr_data,
-    input  [ 9:0] wr_burst_len,
-    output        wr_ack,
-    output        wr_end,
-    output [ 3:0] write_cmd,
-    output [ 1:0] write_ba,
-    output [12:0] write_addr,
-    output        wr_sdram_en,
-    output [15:0] wr_sdram_data
+    input             sys_clk,
+    input             sys_rst_n,
+    input             init_end,
+    input             wr_en,
+    input      [23:0] wr_addr,
+    input      [15:0] wr_data,
+    input      [ 9:0] wr_burst_len,
+    output reg        wr_ack,
+    output reg        wr_end,
+    output reg [ 3:0] write_cmd,
+    output reg [ 1:0] write_ba,
+    output reg [12:0] write_addr,
+    output reg        wr_sdram_en,
+    output     [15:0] wr_sdram_data
 );
 
     reg [7:0] wr_current_state;
     reg [7:0] wr_next_state;
-    reg [3:0] wr_cnt_state;
+    reg [9:0] wr_cnt_state;
 
     always @(*) begin
         case (wr_current_state)
@@ -61,6 +61,8 @@ module sdram_write #(
             WR_DATA: begin
                 if (wr_cnt_state == wr_burst_len) begin
                     wr_next_state = WR_PRE;
+                end else begin
+                    wr_next_state = WR_DATA;
                 end
             end
             WR_PRE: begin
@@ -70,7 +72,7 @@ module sdram_write #(
                 if (wr_cnt_state == WR_TRP_CLK) begin
                     wr_next_state = WR_END;
                 end else begin
-                    wr_next_state = WR_END;
+                    wr_next_state = WR_TRP;
                 end
             end
             WR_END: begin
@@ -90,27 +92,27 @@ module sdram_write #(
 
     always @(posedge sys_clk or negedge sys_rst_n) begin
         if (!sys_rst_n) begin
-            wr_cnt_state <= 4'd0;
+            wr_cnt_state <= 9'd0;
         end else if (wr_current_state == WR_ACTIVE || wr_current_state == WR_TRCD) begin
             if (wr_cnt_state < WR_TRCD_CLK) begin
-                wr_cnt_state <= wr_cnt_state + 4'd1;
+                wr_cnt_state <= wr_cnt_state + 9'd1;
             end else begin
-                wr_cnt_state <= 4'd0;
+                wr_cnt_state <= 9'd0;
             end
         end else if (wr_current_state == WR_WRITE || wr_current_state == WR_DATA) begin
             if (wr_cnt_state < wr_burst_len) begin
-                wr_cnt_state <= wr_cnt_state + 4'd1;
+                wr_cnt_state <= wr_cnt_state + 9'd1;
             end else begin
-                wr_cnt_state <= 4'd0;
+                wr_cnt_state <= 9'd0;
             end
         end else if (wr_current_state == WR_PRE || wr_current_state == WR_TRP) begin
             if (wr_cnt_state < WR_TRCD_CLK) begin
-                wr_cnt_state <= wr_cnt_state + 4'd1;
+                wr_cnt_state <= wr_cnt_state + 9'd1;
             end else begin
-                wr_cnt_state <= 4'd0;
+                wr_cnt_state <= 9'd0;
             end
         end else begin
-            wr_cnt_state <= 4'd0;
+            wr_cnt_state <= 9'd0;
         end
     end
 
@@ -164,17 +166,12 @@ module sdram_write #(
 
     always @(posedge sys_clk or negedge sys_rst_n) begin
         if (!sys_rst_n) begin
-            wr_sdram_en   <= 1'd0;
-            wr_sdram_data <= 16'd0;
-        end else if ((wr_current_state == WR_WRITE && wr_next_state == WR_DATA) ||
-                     (wr_current_state == WR_DATA && wr_next_state != WR_PRE)) begin
-            wr_sdram_en   <= 1'd1;
-            wr_sdram_data <= wr_sdram_data + 16'd1;
-        end else if (wr_current_state == WR_DATA && wr_next_state == WR_PRE) begin
-            wr_sdram_en   <= 1'd1;
-            wr_sdram_data <= 16'd0;
+            wr_sdram_en <= 1'd0;
+        end else begin
+            wr_sdram_en <= wr_ack;
         end
     end
 
+    assign wr_sdram_data = wr_sdram_en ? wr_data : 16'd0;
 
 endmodule
