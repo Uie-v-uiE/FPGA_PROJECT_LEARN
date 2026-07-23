@@ -45,7 +45,7 @@ module sdram_arbit #(
 
     reg [4:0] sdram_current_state;
     reg [4:0] sdram_next_state;
-    reg [4:0] sdram_cmd;
+    reg [3:0] sdram_cmd;
 
     always @(*) begin
         case (sdram_current_state)
