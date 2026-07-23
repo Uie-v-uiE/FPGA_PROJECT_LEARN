@@ -67,7 +67,7 @@ module sdram_read #(
                 end
             end
             RD_DATA: begin
-                if (rd_cnt_state == CL + rd_burst_len) begin
+                if (rd_cnt_state == CL + rd_burst_len - 1) begin
                     rd_next_state = RD_PRE;
                 end else begin
                     rd_next_state = RD_DATA;
@@ -132,13 +132,12 @@ module sdram_read #(
 
     always @(posedge sys_clk or negedge sys_rst_n) begin
         if (!sys_rst_n) begin
+            rd_ack <= 1'd0;
+        end else if (rd_current_state == RD_DATA && (rd_cnt_state >= 10'd0) &&
+                     (rd_cnt_state < (CL + rd_burst_len - 10'd3))) begin
             rd_ack <= 1'd1;
-        end else if (rd_current_state == RD_DATA) begin
-            rd_ack <= 1'd1;
-        end else if (rd_current_state == RD_DATA && rd_cnt_state == CL + rd_burst_len - 10'd3) begin
-            rd_ack <= 1'b0;
         end else begin
-            rd_ack <= rd_ack;
+            rd_ack <= 1'd0;
         end
     end
 
@@ -169,5 +168,15 @@ module sdram_read #(
     end
 
     assign rd_sdram_data = rd_ack ? rd_data : 16'd0;
+
+    always @(posedge sys_clk or negedge sys_rst_n) begin
+        if (!sys_rst_n) begin
+            rd_end <= 1'd0;
+        end else if (rd_current_state == RD_PRE && rd_next_state == RD_TRP) begin
+            rd_end <= 1'd1;
+        end else begin
+            rd_end <= 1'd0;
+        end
+    end
 
 endmodule
